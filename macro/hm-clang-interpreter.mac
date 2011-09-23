@@ -51,7 +51,7 @@ endmacro;
 Main:
 	##old_x=x;
 	##old_y=y;
-
+	
 	call Start;
 
 	//一時ファイルを削除する
@@ -61,6 +61,7 @@ Main:
 	return ##return ;
 
 Start:
+	disabledraw;
 	$$opt				= $_g_opt_base;
 	##use_tmp_file		= true;
 	$$tmp_in_filename	= "";
@@ -107,10 +108,11 @@ MakeFile:
 
 	//選択範囲をクリップボードへコピー
 	copy2;
-
+	escape;
+	
 	//新しい秀丸へ貼り付け
 	##cur_hidemaru = hidemaruhandle(0);
-	newfile;
+	openfile "/h ";
 	##dst_hidemaru = hidemaruhandle(0);
 	poppaste;
 
@@ -129,15 +131,15 @@ SpawnMcpp:
 	$$tmp_in_filename	= "\"" + $$2 + "\"";
 
 	//新しい秀丸へ貼り付け
-	##cur_hidemaru = hidemaruhandle(0);
+	/*##cur_hidemaru = hidemaruhandle(0);
 	newfile;
-	##dst_hidemaru = hidemaruhandle(0);
+	##dst_hidemaru = hidemaruhandle(0);*/
 
 	disabledraw;
 	$cmd = $_g_exe_mcpp + " " + $$opt + " " + $$tmp_in_filename;
 	runex $cmd, 1,
 		0, "",
-		1, "",
+		7, "",
 		1, "",
 		0, "",
 		2, 1, 0;
