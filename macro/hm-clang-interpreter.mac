@@ -5,13 +5,13 @@
 
 【動作】
 ・選択範囲があればその範囲を処理します。
-    →  一時ファイルを使って処理するため #include がうまく処理できません。
+	→	一時ファイルを使って処理するため #include がうまく処理できません。
 
 ・選択範囲が無ければファイル全体を処理します。
-    →  「ファイルが保存されていない 、又は、更新されている」と、一時ファイルを使って
-        処理するため #include がうまく処理できません。
-    → 「ファイルが保存済み、かつ、未更新」なら、ファイルをそのまま使うので、
-        #include もうまく処理できる。
+	→	「ファイルが保存されていない 、又は、更新されている」と、一時ファイルを使って
+		処理するため #include がうまく処理できません。
+	→ 「ファイルが保存済み、かつ、未更新」なら、ファイルをそのまま使うので、
+		#include もうまく処理できる。
 */
 
 
@@ -23,7 +23,7 @@
 //一時ディレクトリ
 //テンポラリファイル名（ベース名）
 //環境変数TMPのディレクトリに生成する。（可能な限り削除される）
-$g_tmpfile_base_name 	= "tmp_hidemaru_clang_interpreter_macro";
+$g_tmpfile_base_name	= "tmp_hidemaru_clang_interpreter_macro";
 
 //clang-interpreter.exe へのパス
 $_g_exe_mcpp= "\"" + currentmacrodirectory + "\\hm-clang-interpreter.exe" + "\"";
@@ -44,14 +44,22 @@ $_g_opt_base= "";
 /////////////////////////////////////////////////////////////////////////////
 $_g_abs_tmp_filename = "";
 
-
-call Main;
+call PreMain;
 endmacro;
+
+PreMain:
+	disablehistory 0xff;
+	$_g_old_searchbuffer = searchbuffer;
+	#_g_searchoption	 = searchoption;
+	setcompatiblemode 0x0003|0x000c|0x0200|0x2000;
+	call Main;
+	setsearch $_g_old_searchbuffer, #_g_searchoption;
+	return ;
 
 Main:
 	##old_x=x;
 	##old_y=y;
-	
+
 	call Start;
 
 	//一時ファイルを削除する
@@ -61,7 +69,6 @@ Main:
 	return ##return ;
 
 Start:
-	disabledraw;
 	$$opt				= $_g_opt_base;
 	##use_tmp_file		= true;
 	$$tmp_in_filename	= "";
@@ -99,22 +106,24 @@ Start:
 
 MakeFile:
 	$$tmp_filename = $$1;
-
+	##has_sel=true;
+	##old_x=x;
+	##old_y=y;
 	if(selecting || rectselecting){
 		//pass
 	}else{
 		selectall;
+		##has_sel=false;
 	}
 
-	//選択範囲をクリップボードへコピー
-	copy2;
-	escape;
-	
+	$$text = gettext2(seltopcolumn,seltoplineno,selendcolumn,selendlineno);
+
 	//新しい秀丸へ貼り付け
 	##cur_hidemaru = hidemaruhandle(0);
-	openfile "/h ";
+	//newfile;
+	openfile "/h";
 	##dst_hidemaru = hidemaruhandle(0);
-	poppaste;
+	insert($$text);
 
 	//新しい秀丸をファイルへ保存
 	saveas $$tmp_filename;
@@ -124,6 +133,11 @@ MakeFile:
 	//この秀丸はいらないので閉じる。
 	closehidemaru ##dst_hidemaru;
 
+	if(! ##has_sel){
+		escape;
+		moveto ##old_x,##old_y;
+	}
+
 	return true;
 
 SpawnMcpp:
@@ -131,9 +145,9 @@ SpawnMcpp:
 	$$tmp_in_filename	= "\"" + $$2 + "\"";
 
 	//新しい秀丸へ貼り付け
-	/*##cur_hidemaru = hidemaruhandle(0);
-	newfile;
-	##dst_hidemaru = hidemaruhandle(0);*/
+	//##cur_hidemaru = hidemaruhandle(0);
+	//newfile;
+	//##dst_hidemaru = hidemaruhandle(0);
 
 	disabledraw;
 	$cmd = $_g_exe_mcpp + " " + $$opt + " " + $$tmp_in_filename;
@@ -157,14 +171,14 @@ GetTempFile:
 	if( leftstr( $$tempdir, 1 ) != "\\" ) {
 		$$tempdir = $$tempdir + "\\";
 	}
-	##n		= tickcount;
-	##end 	= ##n + 1000;
+	##n 	= tickcount;
+	##end	= ##n + 1000;
 	while(##n < ##end){
-	 	$$tempfile = $$tempdir + $g_tmpfile_base_name + str(##n) + $$ext;
-	 	if( !existfile( $$tempfile ) ) {
+		$$tempfile = $$tempdir + $g_tmpfile_base_name + str(##n) + $$ext;
+		if( !existfile( $$tempfile ) ) {
 			return $$tempfile;
 		}
-	 	##n = ##n + 1;
+		##n = ##n + 1;
 	}
 	message "テンポラリファイルが作成できません\n" + $$tempfile;
 	return "";
