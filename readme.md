@@ -8,21 +8,17 @@
 プログラムのコンソール出力(printfなど)を秀丸エディタで表示できます。
 
 
-##実行前
-	#include<stdio.h>
+##hello clang interpreter
+![hello clang interpreter](http://cdn-ak.f.st-hatena.com/images/fotolife/o/ohtorii/20110924/20110924002100.gif "hello clang interpreter")
 
-	int main(int argc, char*argv[]){
-		for(int i=0; i!=4 ; ++i){
-			printf("i=%d\n",i);
-		}
-		return 0;
-	}
 
-##実行後
-	i=0
-	i=1
-	i=2
-	i=3
+##Math & Macro
+![Math_Macro](http://cdn-ak.f.st-hatena.com/images/fotolife/o/ohtorii/20110924/20110924002046.gif "Math & Macro")
+
+
+##Template metaprogramming
+![Template metaprogramming](http://cdn-ak.f.st-hatena.com/images/fotolife/o/ohtorii/20110924/20110924002031.gif "Template metaprogramming")
+
 
 ##インストール
 	下記2ファイルを秀丸マクロのディレクトリへコピーする。
